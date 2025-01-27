@@ -19,9 +19,6 @@ import { z } from "zod";
 import { Checkbox } from "~/components/ui/checkbox";
 
 const formSchema = z.object({
-  fullName: z.string().min(2, {
-    message: "Full name must be at least 2 characters.",
-  }),
   email: z.string().email({
     message: "Please provide a valid email address.",
   }),
@@ -41,17 +38,16 @@ const formSchema = z.object({
       message:
         "Password must contain at least one special character (@, $, !, %, *, ?, &, #).",
     }),
-  terms: z.boolean().default(false).optional(),
+  rememberMe: z.boolean().default(false).optional(),
 });
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
       email: "",
       password: "",
-      terms: false,
+      rememberMe: false,
     },
   });
 
@@ -67,11 +63,11 @@ const RegisterPage = () => {
       </div>
 
       <div className="mt-6 text-center">
-        <h1 className="text-2xl font-bold">Create your account</h1>
+        <h1 className="text-2xl font-bold">Sign in to your account</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link href={"/login"} className="font-medium text-primary">
-            Sign in
+          Don&apos;t have an account?{" "}
+          <Link href={"/register"} className="font-medium text-primary">
+            Sign up
           </Link>
         </p>
       </div>
@@ -80,20 +76,6 @@ const RegisterPage = () => {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -122,26 +104,32 @@ const RegisterPage = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="terms"
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
+              <div className="flex items-center justify-between">
+                <FormField
+                  control={form.control}
+                  name="rememberMe"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
 
-                    <FormLabel>I agree to the terms and conditions</FormLabel>
-                  </FormItem>
-                )}
-              />
+                      <FormLabel>Remember me</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                <Link href={""} className="text-sm font-medium text-primary">
+                  Forgot password?
+                </Link>
+              </div>
 
               <div className="pt-4">
                 <Button type="submit" className="w-full">
-                  Create account
+                  Sign in
                 </Button>
               </div>
             </form>
@@ -180,4 +168,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
