@@ -17,27 +17,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Checkbox } from "~/components/ui/checkbox";
+import { emailSchema, passwordSchema } from "~/app/schemas/auth";
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: "Please provide a valid email address.",
-  }),
-  password: z
-    .string()
-    .min(12, { message: "Password must be at least 12 characters long." })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter.",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter.",
-    })
-    .regex(/[0-9]/, {
-      message: "Password must contain at least one number.",
-    })
-    .regex(/[@$!%*?&#]/, {
-      message:
-        "Password must contain at least one special character (@, $, !, %, *, ?, &, #).",
-    }),
+  email: emailSchema,
+  password: passwordSchema,
   rememberMe: z.boolean().default(false).optional(),
 });
 
