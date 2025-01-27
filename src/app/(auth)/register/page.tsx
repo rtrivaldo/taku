@@ -23,6 +23,7 @@ import {
   passwordSchema,
 } from "~/app/schemas/auth";
 import { api } from "~/trpc/react";
+import { useToast } from "~/hooks/use-toast";
 
 const formSchema = z.object({
   fullName: fullNameSchema,
@@ -34,6 +35,8 @@ const formSchema = z.object({
 });
 
 const RegisterPage = () => {
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,10 +49,18 @@ const RegisterPage = () => {
 
   const { mutate: registerUser, isPending } = api.auth.register.useMutation({
     onSuccess: () => {
-      alert("User created successfully");
+      toast({
+        title: "User created successfully",
+        description: "You can now sign in",
+        variant: "default",
+      });
     },
     onError: (error) => {
-      alert(error.message);
+      toast({
+        title: "Something went wrong",
+        description: error.message,
+        variant: "destructive",
+      });
       console.log(error);
     },
   });
