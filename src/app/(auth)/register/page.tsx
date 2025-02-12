@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FaComments, FaGithub, FaGoogle } from "react-icons/fa";
+import { FaComments, FaGithub, FaGoogle, FaSpinner } from "react-icons/fa";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import {
@@ -25,14 +25,22 @@ import {
 import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
 
-const formSchema = z.object({
-  fullName: fullNameSchema,
-  email: emailSchema,
-  password: passwordSchema,
-  terms: z.boolean().refine((value) => value === true, {
-    message: "You must accept the terms and conditions.",
-  }),
-});
+const formSchema = z
+  .object({
+    fullName: fullNameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, {
+      message: "Please confirm your password.",
+    }),
+    terms: z.boolean().refine((value) => value === true, {
+      message: "You must accept the terms and conditions.",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 const RegisterPage = () => {
   const { toast } = useToast();
@@ -43,6 +51,7 @@ const RegisterPage = () => {
       fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
       terms: false,
     },
   });
@@ -54,6 +63,8 @@ const RegisterPage = () => {
         description: "You can now sign in",
         variant: "default",
       });
+
+      form.reset();
     },
     onError: (error) => {
       toast({
@@ -134,6 +145,20 @@ const RegisterPage = () => {
 
               <FormField
                 control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="terms"
                 render={({ field }) => (
                   <FormItem className="flex items-center space-x-3 space-y-0">
@@ -151,7 +176,11 @@ const RegisterPage = () => {
 
               <div className="pt-4">
                 <Button type="submit" className="w-full" disabled={isPending}>
-                  Create account
+                  {isPending ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    "Create account"
+                  )}
                 </Button>
               </div>
             </form>
